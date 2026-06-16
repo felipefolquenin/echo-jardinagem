@@ -580,48 +580,82 @@ function chM(d){ST.m+=d;if(ST.m>11){ST.m=0;ST.y++;}if(ST.m<0){ST.m=11;ST.y--;}re
 
 // ═══ PWA SETUP ═══════════════════════════════════
 (function(){
+  if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone) return;
+
   const iconSVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="256" fill="#1a4a2e"/><circle cx="256" cy="256" r="240" fill="#edeade"/><path d="M 236,224 Q 248,168 268,115" stroke="#2d4a2e" stroke-width="6.4" fill="none" stroke-linecap="round"/><path d="M 236,220 C 204,218 171,198 177,164 C 204,172 230,200 236,220 Z" fill="#2d4a2e"/><path d="M 248,172 C 212,162 187,128 200,100 C 228,112 246,148 248,172 Z" fill="#2d4a2e"/><path d="M 264,128 C 290,90 330,74 340,102 C 312,120 284,130 264,128 Z" fill="#2d4a2e"/><text x="256" y="376" text-anchor="middle" font-family="Georgia,serif" font-size="74" fill="#2d4a2e">echo</text><line x1="138" y1="404" x2="170" y2="404" stroke="#2d4a2e" stroke-width="4"/><line x1="342" y1="404" x2="374" y2="404" stroke="#2d4a2e" stroke-width="4"/><text x="256" y="418" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#2d4a2e">JARDINAGEM</text></svg>`;
   const iconURL=URL.createObjectURL(new Blob([iconSVG],{type:'image/svg+xml'}));
 
-  // Manifest
-  const manifest={name:"Echo Jardinagem",short_name:"Echo",description:"Jardinagem Profissional em Guarapuava - PR",theme_color:"#1a4a2e",background_color:"#0d2b1a",display:"standalone",orientation:"portrait-primary",start_url:"./",scope:"./",lang:"pt-BR",categories:["lifestyle","utilities"],icons:[{src:iconURL,sizes:"any",type:"image/svg+xml",purpose:"any maskable"}]};
-  const mLink=document.createElement('link');
-  mLink.rel='manifest';
-  mLink.href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'}));
-  document.head.appendChild(mLink);
-
   // Apple touch icon
-  const aIcon=document.createElement('link');
-  aIcon.rel='apple-touch-icon';aIcon.href=iconURL;
-  document.head.appendChild(aIcon);
+  const ai=document.createElement('link');ai.rel='apple-touch-icon';ai.href=iconURL;document.head.appendChild(ai);
+
+  // Manifest via data URI (mais confiável que Blob)
+  const man={name:"Echo Jardinagem",short_name:"Echo",description:"Jardinagem Profissional em Guarapuava - PR",theme_color:"#1a4a2e",background_color:"#0d2b1a",display:"standalone",orientation:"portrait-primary",start_url:"./",scope:"./",lang:"pt-BR",icons:[{src:iconURL,sizes:"any",type:"image/svg+xml",purpose:"any maskable"}]};
+  const ml=document.createElement('link');ml.rel='manifest';ml.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(man));document.head.appendChild(ml);
 
   // Service Worker
   if('serviceWorker' in navigator){
-    const sw=`const C='echo-v1';
-self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['/']).catch(()=>{})));});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(cached=>{const net=fetch(e.request).then(r=>{if(r&&r.ok){const cl=r.clone();caches.open(C).then(c=>c.put(e.request,cl));}return r;}).catch(()=>cached);return cached||net;}));});`;
-    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})),{scope:'./'})
-      .then(()=>console.log('✅ PWA ativo!'))
-      .catch(e=>console.log('SW indisponível no preview:',e.message));
+    const sw=`const C='echo-v1';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{self.clients.claim();});self.addEventListener('fetch',e=>{if(e.request.method==='GET')e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
+    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})),{scope:'./'}).catch(()=>{});
   }
 
-  // Banner de instalação
-  let prompt;
-  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;showBanner();});
-  window.addEventListener('appinstalled',()=>{const b=document.getElementById('pwa-b');if(b)b.remove();console.log('✅ App instalado!');});
+  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  let prompt=null;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;});
+  window.addEventListener('appinstalled',()=>{const f=document.getElementById('pwa-fab');if(f)f.remove();});
 
-  function showBanner(){
-    if(document.getElementById('pwa-b'))return;
-    const b=document.createElement('div');
-    b.id='pwa-b';
-    b.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:998;background:#1a4a2e;color:#fff;padding:.75rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 2px 16px rgba(0,0,0,.25);animation:pwaSlide .35s ease';
-    b.innerHTML=`<div style="display:flex;align-items:center;gap:.75rem"><img src="${iconURL}" style="width:38px;height:38px;border-radius:10px"><div><div style="font-size:.85rem;font-weight:700">Instalar Echo Jardinagem</div><div style="font-size:.74rem;color:#95d5b2;margin-top:1px">Adicione à tela inicial gratuitamente</div></div></div><div style="display:flex;gap:.5rem;flex-shrink:0"><button onclick="document.getElementById('pwa-b').remove()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:.4rem .85rem;border-radius:20px;cursor:pointer;font-size:.8rem;font-family:inherit">Agora não</button><button id="pwa-btn" style="background:#52b788;border:none;color:#fff;padding:.4rem .95rem;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:inherit">📲 Instalar</button></div>`;
-    document.body.appendChild(b);
-    document.getElementById('pwa-btn').onclick=async()=>{if(prompt){prompt.prompt();const{outcome}=await prompt.userChoice;prompt=null;b.remove();console.log('Resultado:',outcome);}};
-    const s=document.createElement('style');
-    s.textContent='@keyframes pwaSlide{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}';
-    document.head.appendChild(s);
+  // Estilos
+  const st=document.createElement('style');
+  st.textContent=`
+    #pwa-fab{position:fixed;bottom:165px;right:1.5rem;z-index:995;background:#1a4a2e;color:#fff;border:1.5px solid rgba(82,183,136,.4);border-radius:24px;padding:.65rem 1.2rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:.5rem;box-shadow:0 4px 18px rgba(0,0,0,.28);transition:all .2s}
+    #pwa-fab:hover{background:#2d6a4f;transform:translateY(-2px)}
+    @media(max-width:768px){#pwa-fab{bottom:148px;right:1rem}}
+    .pwa-overlay{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;animation:pwafade .2s ease}
+    .pwa-box{background:#fff;border-radius:20px 20px 0 0;padding:1.8rem 1.5rem 2rem;width:100%;max-width:480px;animation:pwaup .3s ease}
+    .pwa-box h3{font-size:1.1rem;color:#1a4a2e;font-weight:800;margin-bottom:1.2rem}
+    .pwa-step{display:flex;align-items:flex-start;gap:.9rem;padding:.75rem 0;border-bottom:1px solid #e2ebe4}
+    .pwa-step:last-child{border-bottom:none}
+    .pwa-step-i{font-size:1.5rem;flex-shrink:0;margin-top:2px}
+    .pwa-step strong{display:block;font-size:.9rem;color:#1a4a2e;margin-bottom:.15rem;font-weight:700}
+    .pwa-step p{font-size:.85rem;color:#4a5a50;line-height:1.5;margin:0}
+    .pwa-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#8a9a8f;flex-shrink:0}
+    @keyframes pwafade{from{opacity:0}to{opacity:1}}
+    @keyframes pwaup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  `;
+  document.head.appendChild(st);
+
+  // Botão flutuante de instalar
+  const fab=document.createElement('button');
+  fab.id='pwa-fab';fab.innerHTML='📲 Instalar App';
+  fab.onclick=handleInstall;
+  document.body.appendChild(fab);
+
+  function handleInstall(){
+    if(prompt){
+      prompt.prompt();
+      prompt.userChoice.then(({outcome})=>{if(outcome==='accepted'){fab.remove();}prompt=null;});
+    } else if(isIOS){
+      showModal(`📲 Instalar no iPhone / iPad`,`
+        <div class="pwa-step"><span class="pwa-step-i">1️⃣</span><div><strong>Abra no Safari</strong><p>Certifique-se de estar usando o navegador <strong>Safari</strong> no seu iPhone ou iPad</p></div></div>
+        <div class="pwa-step"><span class="pwa-step-i">2️⃣</span><div><strong>Toque em Compartilhar ⬆️</strong><p>Toque no ícone de compartilhar na barra inferior do Safari</p></div></div>
+        <div class="pwa-step"><span class="pwa-step-i">3️⃣</span><div><strong>Adicionar à Tela de Início</strong><p>Role para baixo e toque em <strong>"Adicionar à Tela de Início"</strong></p></div></div>
+        <div class="pwa-step"><span class="pwa-step-i">✅</span><div><strong>Pronto!</strong><p>O ícone da Echo Jardinagem aparecerá na sua tela inicial como um app</p></div></div>
+      `);
+    } else {
+      showModal(`📲 Instalar no Android`,`
+        <div class="pwa-step"><span class="pwa-step-i">1️⃣</span><div><strong>Abra no Chrome</strong><p>Certifique-se de estar usando o <strong>Google Chrome</strong> no seu Android</p></div></div>
+        <div class="pwa-step"><span class="pwa-step-i">2️⃣</span><div><strong>Toque nos 3 pontos ⋮</strong><p>No canto superior direito do Chrome</p></div></div>
+        <div class="pwa-step"><span class="pwa-step-i">3️⃣</span><div><strong>Adicionar à tela inicial</strong><p>Toque em <strong>"Adicionar à tela inicial"</strong> ou <strong>"Instalar app"</strong></p></div></div>
+        <div class="pwa-step"><span class="pwa-step-i">✅</span><div><strong>Pronto!</strong><p>O app Echo Jardinagem estará disponível na sua tela inicial</p></div></div>
+      `);
+    }
+  }
+
+  function showModal(title, content){
+    const m=document.createElement('div');
+    m.className='pwa-overlay';
+    m.innerHTML=`<div class="pwa-box"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem"><h3>${title}</h3><button class="pwa-close" onclick="this.closest('.pwa-overlay').remove()">✕</button></div>${content}</div>`;
+    m.onclick=e=>{if(e.target===m)m.remove();};
+    document.body.appendChild(m);
   }
 })();}
 function selD(d,m,y){ST.date=new Date(y,m,d);document.getElementById("b2").disabled=false;renderCal();}
