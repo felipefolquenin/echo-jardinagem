@@ -9,6 +9,11 @@
 <meta property="og:description" content="Corte de grama, poda de árvores, irrigação e iluminação em Guarapuava. Orçamento gratuito e sem compromisso. Ligue (42) 98840-8840">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
+<meta name="theme-color" content="#1a4a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Echo Jardinagem">
+<meta name="mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--c900:#0d2b1a;--c800:#1a4a2e;--c700:#2d6a4f;--c600:#40916c;--c500:#52b788;--c400:#74c69d;--c300:#95d5b2;--c200:#b7e4c7;--c100:#d8f3dc;--c50:#f0faf3;--g800:#1f2d26;--g600:#4a5a50;--g400:#8a9a8f;--g200:#e2ebe4;--r:12px;--sh:0 4px 20px rgba(0,0,0,.12)}
@@ -571,7 +576,54 @@ function renderCal(){
   document.getElementById("cal").innerHTML=h+`</div>`;
 }
 
-function chM(d){ST.m+=d;if(ST.m>11){ST.m=0;ST.y++;}if(ST.m<0){ST.m=11;ST.y--;}renderCal();}
+function chM(d){ST.m+=d;if(ST.m>11){ST.m=0;ST.y++;}if(ST.m<0){ST.m=11;ST.y--;}renderCal();
+
+// ═══ PWA SETUP ═══════════════════════════════════
+(function(){
+  const iconSVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="256" fill="#1a4a2e"/><circle cx="256" cy="256" r="240" fill="#edeade"/><path d="M 236,224 Q 248,168 268,115" stroke="#2d4a2e" stroke-width="6.4" fill="none" stroke-linecap="round"/><path d="M 236,220 C 204,218 171,198 177,164 C 204,172 230,200 236,220 Z" fill="#2d4a2e"/><path d="M 248,172 C 212,162 187,128 200,100 C 228,112 246,148 248,172 Z" fill="#2d4a2e"/><path d="M 264,128 C 290,90 330,74 340,102 C 312,120 284,130 264,128 Z" fill="#2d4a2e"/><text x="256" y="376" text-anchor="middle" font-family="Georgia,serif" font-size="74" fill="#2d4a2e">echo</text><line x1="138" y1="404" x2="170" y2="404" stroke="#2d4a2e" stroke-width="4"/><line x1="342" y1="404" x2="374" y2="404" stroke="#2d4a2e" stroke-width="4"/><text x="256" y="418" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#2d4a2e">JARDINAGEM</text></svg>`;
+  const iconURL=URL.createObjectURL(new Blob([iconSVG],{type:'image/svg+xml'}));
+
+  // Manifest
+  const manifest={name:"Echo Jardinagem",short_name:"Echo",description:"Jardinagem Profissional em Guarapuava - PR",theme_color:"#1a4a2e",background_color:"#0d2b1a",display:"standalone",orientation:"portrait-primary",start_url:"./",scope:"./",lang:"pt-BR",categories:["lifestyle","utilities"],icons:[{src:iconURL,sizes:"any",type:"image/svg+xml",purpose:"any maskable"}]};
+  const mLink=document.createElement('link');
+  mLink.rel='manifest';
+  mLink.href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'}));
+  document.head.appendChild(mLink);
+
+  // Apple touch icon
+  const aIcon=document.createElement('link');
+  aIcon.rel='apple-touch-icon';aIcon.href=iconURL;
+  document.head.appendChild(aIcon);
+
+  // Service Worker
+  if('serviceWorker' in navigator){
+    const sw=`const C='echo-v1';
+self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['/']).catch(()=>{})));});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(cached=>{const net=fetch(e.request).then(r=>{if(r&&r.ok){const cl=r.clone();caches.open(C).then(c=>c.put(e.request,cl));}return r;}).catch(()=>cached);return cached||net;}));});`;
+    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})),{scope:'./'})
+      .then(()=>console.log('✅ PWA ativo!'))
+      .catch(e=>console.log('SW indisponível no preview:',e.message));
+  }
+
+  // Banner de instalação
+  let prompt;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;showBanner();});
+  window.addEventListener('appinstalled',()=>{const b=document.getElementById('pwa-b');if(b)b.remove();console.log('✅ App instalado!');});
+
+  function showBanner(){
+    if(document.getElementById('pwa-b'))return;
+    const b=document.createElement('div');
+    b.id='pwa-b';
+    b.style.cssText='position:fixed;top:68px;left:0;right:0;z-index:998;background:#1a4a2e;color:#fff;padding:.75rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 2px 16px rgba(0,0,0,.25);animation:pwaSlide .35s ease';
+    b.innerHTML=`<div style="display:flex;align-items:center;gap:.75rem"><img src="${iconURL}" style="width:38px;height:38px;border-radius:10px"><div><div style="font-size:.85rem;font-weight:700">Instalar Echo Jardinagem</div><div style="font-size:.74rem;color:#95d5b2;margin-top:1px">Adicione à tela inicial gratuitamente</div></div></div><div style="display:flex;gap:.5rem;flex-shrink:0"><button onclick="document.getElementById('pwa-b').remove()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:.4rem .85rem;border-radius:20px;cursor:pointer;font-size:.8rem;font-family:inherit">Agora não</button><button id="pwa-btn" style="background:#52b788;border:none;color:#fff;padding:.4rem .95rem;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:inherit">📲 Instalar</button></div>`;
+    document.body.appendChild(b);
+    document.getElementById('pwa-btn').onclick=async()=>{if(prompt){prompt.prompt();const{outcome}=await prompt.userChoice;prompt=null;b.remove();console.log('Resultado:',outcome);}};
+    const s=document.createElement('style');
+    s.textContent='@keyframes pwaSlide{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}';
+    document.head.appendChild(s);
+  }
+})();}
 function selD(d,m,y){ST.date=new Date(y,m,d);document.getElementById("b2").disabled=false;renderCal();}
 
 async function renderSlots(){
