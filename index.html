@@ -245,10 +245,10 @@ footer b{color:var(--c400)}
   .wa-float svg{width:26px;height:26px}
   .wa-float-label{display:none}
   .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:999;background:rgba(13,43,26,.97);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.12);padding:.5rem 0}
-  .mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:.18rem;background:none;border:none;color:var(--c300);font-family:inherit;font-size:.65rem;font-weight:500;cursor:pointer;padding:.45rem .2rem;transition:all .2s;-webkit-tap-highlight-color:transparent}
+  .mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:.13rem;background:none;border:none;color:var(--c300);font-family:inherit;font-size:.55rem;font-weight:500;cursor:pointer;padding:.4rem .04rem;transition:all .2s;-webkit-tap-highlight-color:transparent}
   .mob-tab.active{color:#fff}
-  .mob-ico{font-size:1.35rem;transition:transform .2s;display:block;line-height:1}
-  .mob-tab.active .mob-ico{transform:scale(1.2)}
+  .mob-ico{font-size:1.18rem;transition:transform .2s;display:block;line-height:1}
+  .mob-tab.active .mob-ico{transform:scale(1.12)}
 }
 @media(max-width:480px){
   .hero-title{font-size:clamp(2.5rem,11vw,3.2rem)}
@@ -513,6 +513,7 @@ footer b{color:var(--c400)}
   <button class="mob-tab" onclick="goto('agendar');setTab(this)"><span class="mob-ico">📅</span><span>Agendar</span></button>
   <button class="mob-tab" onclick="goto('sobre');setTab(this)"><span class="mob-ico">⭐</span><span>Sobre</span></button>
   <button class="mob-tab" onclick="goto('contato');setTab(this)"><span class="mob-ico">📞</span><span>Contato</span></button>
+  <button class="mob-tab" onclick="installApp()"><span class="mob-ico">📲</span><span>Instalar</span></button>
 </nav>
 
 <!-- FLOATING WA BUTTON -->
@@ -579,6 +580,21 @@ function renderCal(){
 
 function chM(d){ST.m+=d;if(ST.m>11){ST.m=0;ST.y++;}if(ST.m<0){ST.m=11;ST.y--;}renderCal();
 
+// ═══ INSTALL FUNCTION (global) ═══════════════════
+window.installApp=function(){
+  if(window._pwa){window._pwa.prompt();window._pwa.userChoice.then(()=>window._pwa=null);return;}
+  if(document.getElementById('imod'))return document.getElementById('imod').remove();
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const S=(n,t,d)=>`<div style="display:flex;gap:.85rem;padding:.8rem 0;border-bottom:1px solid #e2ebe4;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:${n==='✓'?'#52b788':'#1a4a2e'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">${n}</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">${t}</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">${d}</p></div></div>`;
+  const pa=S(1,'Abra no Google Chrome','Use o Chrome no seu Android')+S(2,'Toque nos 3 pontos ⋮','Canto superior direito do Chrome')+S(3,'Toque em "Instalar app"','Ou "Adicionar à tela inicial"')+S('✓','Pronto!','App Echo Jardinagem instalado 🌿');
+  const pi=S(1,'Abra no Safari','Use o Safari no iPhone ou iPad')+S(2,'Toque em Compartilhar ⬆️','Ícone na barra inferior do Safari')+S(3,'"Adicionar à Tela de Início"','Role a lista para encontrar esta opção')+S('✓','Pronto!','App Echo Jardinagem instalado 🌿');
+  const tb=(id,label,on)=>`<button id="tb-${id}" onclick="iTab('${id}')" style="flex:1;padding:.6rem;border-radius:10px;border:2px solid ${on?'#52b788':'#e2ebe4'};background:${on?'#f0faf3':'#fff'};cursor:pointer;font-weight:600;font-size:.85rem;font-family:inherit;color:${on?'#2d6a4f':'#8a9a8f'}">${label}</button>`;
+  const m=document.createElement('div');m.id='imod';
+  m.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:1.5rem';
+  m.innerHTML=`<div style="background:#fff;border-radius:20px;padding:1.8rem;width:100%;max-width:440px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem"><h3 style="font-size:1.05rem;font-weight:800;color:#1a4a2e">📲 Instalar Echo Jardinagem</h3><button onclick="document.getElementById('imod').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#aaa;line-height:1">✕</button></div><div style="display:flex;gap:.5rem;margin-bottom:1.2rem">${tb('a','🤖 Android',!ios)}${tb('i','🍎 iPhone',ios)}</div><div id="pn-a" style="display:${ios?'none':'block'}">${pa}</div><div id="pn-i" style="display:${ios?'block':'none'}">${pi}</div></div>`;
+  m.onclick=e=>{if(e.target===m)m.remove();};document.body.appendChild(m);
+};
+window.iTab=function(t){['a','i'].forEach(x=>{const on=x===t,b=document.getElementById('tb-'+x),p=document.getElementById('pn-'+x);if(b){b.style.borderColor=on?'#52b788':'#e2ebe4';b.style.background=on?'#f0faf3':'#fff';b.style.color=on?'#2d6a4f':'#8a9a8f';}if(p)p.style.display=on?'block':'none';});};
 // ═══ PWA SETUP ═══════════════════════════════════
 (function(){
   if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone) return;
@@ -601,8 +617,9 @@ function chM(d){ST.m+=d;if(ST.m>11){ST.m=0;ST.y++;}if(ST.m<0){ST.m=11;ST.y--;}re
 
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   let prompt=null;
-  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;});
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;window._pwa=e;});
   window.addEventListener('appinstalled',()=>{const f=document.getElementById('pwa-fab');if(f)f.remove();});
+  window.installApp=handleInstall;
 
   // Estilos
   const st=document.createElement('style');
