@@ -506,6 +506,32 @@ footer b{color:var(--c400)}
 
 </div><!-- /scroller -->
 
+<!-- MODAL INSTALAR APP -->
+<div id="imod" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:1.5rem" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:20px;padding:1.8rem;width:100%;max-width:440px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem">
+      <h3 style="font-size:1.05rem;font-weight:800;color:#1a4a2e">📲 Instalar Echo Jardinagem</h3>
+      <button onclick="document.getElementById('imod').style.display='none'" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#aaa;line-height:1">✕</button>
+    </div>
+    <div style="display:flex;gap:.5rem;margin-bottom:1.2rem">
+      <button id="tb-a" onclick="iTab('a')" style="flex:1;padding:.6rem;border-radius:10px;border:2px solid #52b788;background:#f0faf3;cursor:pointer;font-weight:600;font-size:.85rem;font-family:inherit;color:#2d6a4f">🤖 Android</button>
+      <button id="tb-i" onclick="iTab('i')" style="flex:1;padding:.6rem;border-radius:10px;border:2px solid #e2ebe4;background:#fff;cursor:pointer;font-weight:600;font-size:.85rem;font-family:inherit;color:#8a9a8f">🍎 iPhone</button>
+    </div>
+    <div id="pn-a">
+      <div style="display:flex;gap:.85rem;padding:.8rem 0;border-bottom:1px solid #e2ebe4;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:#1a4a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">1</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">Abra no Google Chrome</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">Use o Chrome no seu Android</p></div></div>
+      <div style="display:flex;gap:.85rem;padding:.8rem 0;border-bottom:1px solid #e2ebe4;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:#1a4a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">2</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">Toque nos 3 pontos ⋮</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">Canto superior direito do Chrome</p></div></div>
+      <div style="display:flex;gap:.85rem;padding:.8rem 0;border-bottom:1px solid #e2ebe4;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:#1a4a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">3</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">Toque em "Instalar app"</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">Ou "Adicionar à tela inicial"</p></div></div>
+      <div style="display:flex;gap:.85rem;padding:.8rem 0;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:#52b788;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">✓</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">Pronto!</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">App Echo Jardinagem instalado na tela inicial 🌿</p></div></div>
+    </div>
+    <div id="pn-i" style="display:none">
+      <div style="display:flex;gap:.85rem;padding:.8rem 0;border-bottom:1px solid #e2ebe4;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:#1a4a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">1</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">Abra no Safari</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">Use o Safari no iPhone ou iPad</p></div></div>
+      <div style="display:flex;gap:.85rem;padding:.8rem 0;border-bottom:1px solid #e2ebe4;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:#1a4a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">2</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">Toque em Compartilhar ⬆️</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">Ícone na barra inferior do Safari</p></div></div>
+      <div style="display:flex;gap:.85rem;padding:.8rem 0;border-bottom:1px solid #e2ebe4;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:#1a4a2e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">3</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">"Adicionar à Tela de Início"</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">Role a lista para encontrar esta opção</p></div></div>
+      <div style="display:flex;gap:.85rem;padding:.8rem 0;align-items:flex-start"><div style="min-width:28px;height:28px;border-radius:50%;background:#52b788;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0">✓</div><div><b style="display:block;color:#1a4a2e;font-size:.9rem;margin-bottom:.1rem">Pronto!</b><p style="color:#4a5a50;font-size:.83rem;line-height:1.5;margin:0">App Echo Jardinagem instalado na tela inicial 🌿</p></div></div>
+    </div>
+  </div>
+</div>
+
 <!-- MOBILE BOTTOM NAV -->
 <nav class="mobile-nav">
   <button class="mob-tab active" onclick="goto('hero');setTab(this)"><span class="mob-ico">🏠</span><span>Início</span></button>
