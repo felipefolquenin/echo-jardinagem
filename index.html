@@ -14,6 +14,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Echo Jardinagem">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--c900:#0d2b1a;--c800:#1a4a2e;--c700:#2d6a4f;--c600:#40916c;--c500:#52b788;--c400:#74c69d;--c300:#95d5b2;--c200:#b7e4c7;--c100:#d8f3dc;--c50:#f0faf3;--g800:#1f2d26;--g600:#4a5a50;--g400:#8a9a8f;--g200:#e2ebe4;--r:12px;--sh:0 4px 20px rgba(0,0,0,.12)}
@@ -622,7 +624,12 @@ window.iTab=function(t){
   });
 };
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window._pwa=e;});
-window.addEventListener('appinstalled',function(){window._pwa=null;});}
+window.addEventListener('appinstalled',function(){window._pwa=null;});
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js')
+    .then(function(){console.log('✅ PWA ativo!');})
+    .catch(function(e){console.warn('SW erro:',e);});
+}}
 function selD(d,m,y){ST.date=new Date(y,m,d);document.getElementById("b2").disabled=false;renderCal();}
 
 async function renderSlots(){
