@@ -1,0 +1,13 @@
+{
+  "name": "Echo Jardinagem",
+  "short_name": "Echo",
+  "description": "Jardinagem Profissional em Guarapuava - PR",
+  "theme_color": "#1a4a2e",
+  "background_color": "#0d2b1a",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "start_url": "./",
+  "scope": "./",
+  "lang": "pt-BR",
+  "icons": [{ "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
