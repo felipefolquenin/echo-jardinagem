@@ -9,17 +9,12 @@
 <meta property="og:description" content="Corte de grama, poda de árvores, irrigação e iluminação em Guarapuava. Orçamento gratuito e sem compromisso. Ligue (42) 98840-8840">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
-<meta name="theme-color" content="#1a4a2e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Echo Jardinagem">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./icon.svg">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--c900:#0d2b1a;--c800:#1a4a2e;--c700:#2d6a4f;--c600:#40916c;--c500:#52b788;--c400:#74c69d;--c300:#95d5b2;--c200:#b7e4c7;--c100:#d8f3dc;--c50:#f0faf3;--g800:#1f2d26;--g600:#4a5a50;--g400:#8a9a8f;--g200:#e2ebe4;--r:12px;--sh:0 4px 20px rgba(0,0,0,.12)}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--c900)}
 body{font-family:'Inter','Segoe UI',sans-serif;background:#fff;color:var(--g800);line-height:1.6;overflow:hidden}
 
 nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(13,43,26,.96);backdrop-filter:blur(12px);padding:0 2rem;height:68px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -246,7 +241,7 @@ footer b{color:var(--c400)}
   .wa-float{bottom:82px;right:1rem;width:52px;height:52px}
   .wa-float svg{width:26px;height:26px}
   .wa-float-label{display:none}
-  .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:999;background:rgba(13,43,26,.97);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.12);padding:.5rem 0}
+  .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:999;background:rgba(13,43,26,.97);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.12);padding:.5rem 0 calc(.5rem + env(safe-area-inset-bottom, 0px))}
   .mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:.13rem;background:none;border:none;color:var(--c300);font-family:inherit;font-size:.55rem;font-weight:500;cursor:pointer;padding:.4rem .04rem;transition:all .2s;-webkit-tap-highlight-color:transparent}
   .mob-tab.active{color:#fff}
   .mob-ico{font-size:1.18rem;transition:transform .2s;display:block;line-height:1}
@@ -271,7 +266,6 @@ footer b{color:var(--c400)}
     <li><button onclick="goto('sobre')">Sobre</button></li>
     <li><button onclick="goto('contato')">Contato</button></li>
     <li><button onclick="goto('agendar')" class="nav-cta">Agendar</button></li>
-    <li><button onclick="installApp()" style="background:rgba(82,183,136,.18);color:var(--c300);padding:.45rem 1rem;border-radius:100px;border:1px solid rgba(82,183,136,.3)">📲 Instalar App</button></li>
   </ul>
 </nav>
 
@@ -541,7 +535,6 @@ footer b{color:var(--c400)}
   <button class="mob-tab" onclick="goto('agendar');setTab(this)"><span class="mob-ico">📅</span><span>Agendar</span></button>
   <button class="mob-tab" onclick="goto('sobre');setTab(this)"><span class="mob-ico">⭐</span><span>Sobre</span></button>
   <button class="mob-tab" onclick="goto('contato');setTab(this)"><span class="mob-ico">📞</span><span>Contato</span></button>
-  <button class="mob-tab" onclick="installApp()"><span class="mob-ico">📲</span><span>Instalar</span></button>
 </nav>
 
 <!-- FLOATING WA BUTTON -->
@@ -606,30 +599,7 @@ function renderCal(){
   document.getElementById("cal").innerHTML=h+`</div>`;
 }
 
-function chM(d){ST.m+=d;if(ST.m>11){ST.m=0;ST.y++;}if(ST.m<0){ST.m=11;ST.y--;}renderCal();
-
-// ═══ INSTALAR APP ════════════════════════════════
-window.installApp=function(){
-  if(window._pwa){window._pwa.prompt();window._pwa.userChoice.then(function(){window._pwa=null;});return;}
-  var m=document.getElementById('imod');
-  if(m){m.style.display='flex';}
-};
-window.iTab=function(t){
-  ['a','i'].forEach(function(x){
-    var on=x===t;
-    var b=document.getElementById('tb-'+x);
-    var p=document.getElementById('pn-'+x);
-    if(b){b.style.borderColor=on?'#52b788':'#e2ebe4';b.style.background=on?'#f0faf3':'#fff';b.style.color=on?'#2d6a4f':'#8a9a8f';}
-    if(p) p.style.display=on?'block':'none';
-  });
-};
-window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window._pwa=e;});
-window.addEventListener('appinstalled',function(){window._pwa=null;});
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js')
-    .then(function(){console.log('✅ PWA ativo!');})
-    .catch(function(e){console.warn('SW erro:',e);});
-}}
+function chM(d){ST.m+=d;if(ST.m>11){ST.m=0;ST.y++;}if(ST.m<0){ST.m=11;ST.y--;}renderCal();}
 function selD(d,m,y){ST.date=new Date(y,m,d);document.getElementById("b2").disabled=false;renderCal();}
 
 async function renderSlots(){
